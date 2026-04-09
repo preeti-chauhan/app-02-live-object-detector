@@ -71,6 +71,10 @@ YOLOv8n exported to CoreML (6.5 MB). Benchmarked across compute unit configurati
 
 `ALL` routes to the Neural Engine automatically — ~4× faster than CPU-only. This is the config used in the iPhone app.
 
+**End-to-end demo** — CoreML model running on the bus street scene, parsing `coordinates` and `confidence` outputs, drawing bounding boxes with class labels:
+
+<img src="assets/yolo_coreml_demo.png"/>
+
 ---
 
 ## iPhone App
