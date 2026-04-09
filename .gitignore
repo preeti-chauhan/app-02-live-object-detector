@@ -1,0 +1,17 @@
+models/
+data/
+**/__pycache__/
+.DS_Store
+*.pyc
+*.pyo
+.ipynb_checkpoints/
+
+# Xcode
+xcuserdata/
+*.xcuserstate
+
+# Large files
+*.mov
+*.mlpackage
+*.pt
+*.pth
