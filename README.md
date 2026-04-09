@@ -61,6 +61,12 @@ Two models are studied: DETR to understand transformer-based detection, YOLOv8 f
 
 ## Results
 
+**Sample image used for detection:**
+
+<img src="assets/sample_image.jpeg" width="600"/>
+
+---
+
 ### DETR — Transformer-Based Detection
 
 <img src="assets/detr_detection.png"/>
