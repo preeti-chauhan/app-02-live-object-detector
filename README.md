@@ -23,7 +23,17 @@ Object detection running on-device via CoreML. Select a photo — the model draw
 
 ## Dataset
 
-COCO 2017 — 80 object classes, 118k train / 5k val images.
+**COCO 2017 (Common Objects in Context)**
+
+80 everyday object classes — people, animals, vehicles, food, furniture, electronics, and more.
+
+- 118k training images, 5k validation images
+- Each image contains multiple objects, each annotated with a bounding box and class label
+- Annotation format: `[x, y, width, height]` (top-left corner + size)
+
+Unlike scene classification (one label per image), COCO requires the model to find *where* each object is and *what* it is — simultaneously.
+
+Both DETR and YOLOv8 are pretrained on COCO, so no training from scratch is needed.
 
 ---
 
