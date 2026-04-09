@@ -85,7 +85,7 @@ Same image, both models. The panel titles show the key difference:
 
 <img src="assets/detr_vs_yolo.png"/>
 
-DETR produces 18 boxes — but 9 of them are street lamps misclassified as *traffic light* and arms misclassified as *handbag*. YOLOv8 produces 10 cleaner detections with no such false positives on this scene. Both models have the same underlying limitation — they can only predict the 80 COCO classes — but YOLOv8's detection head produces fewer spurious matches on objects that loosely resemble a known class.
+DETR produces 18 boxes — but several are arms detected as *handbag* and duplicate boxes on the same object. YOLOv8 produces 10 cleaner detections with fewer spurious matches on this scene. Both models have the same underlying limitation — they can only predict the 80 COCO classes — but YOLOv8's detection head produces fewer spurious matches on objects that loosely resemble a known class.
 
 Combined with 13× fewer parameters and a clean CoreML export, YOLOv8 is used for all practical inference. DETR is studied for its architecture — the first end-to-end detector with no anchors and no NMS.
 
@@ -128,8 +128,6 @@ YOLOv8n exported to CoreML (6.5 MB). Benchmarked across compute unit configurati
 **End-to-end CoreML inference** — the exported model running through the full on-device pipeline: CoreML loads the `.mlpackage`, runs inference, and returns `coordinates` (N×4 normalized boxes) and `confidence` (N×80 class scores). This confirms the export is correct and the output format parses as expected before building the iPhone app.
 
 <img src="assets/yolo_coreml_demo.png"/>
-
-> **Note:** The street lamp on the right is detected as *traffic light* — COCO has no street lamp class, so the model maps it to the nearest known category. This is expected when real-world objects fall outside the 80 training classes.
 
 ---
 
