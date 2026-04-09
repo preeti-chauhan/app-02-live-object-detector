@@ -93,7 +93,7 @@ The chart below makes the difference clear:
 
 <img src="assets/detr_vs_yolo_chart.png"/>
 
-Red bars are classes DETR detects but YOLOv8 doesn't — handbag (arms misread as bags), truck (the van), stop sign. DETR also fires 8 traffic light boxes vs YOLOv8's 3, over-detecting on every lamp post. YOLOv8 produces fewer, more precise detections with 13× fewer parameters.
+Red bars are classes DETR detects but YOLOv8 misses — handbag (pedestrian carrying a bag, low confidence), truck (the van), stop sign. DETR also fires 8 traffic light boxes vs YOLOv8's 3, over-detecting on lamp posts. YOLOv8 produces fewer, more precise detections with 13× fewer parameters.
 
 Combined with a clean CoreML export, YOLOv8 is used for all practical inference. DETR is studied for its architecture — the first end-to-end detector with no anchors and no NMS.
 
