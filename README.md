@@ -9,9 +9,67 @@ Object detection on iPhone using DETR and YOLOv8 — bounding box prediction wit
 | Notebook | Description |
 |---|---|
 | `01_detr_architecture.ipynb` | DETR internals: encoder-decoder transformer, bipartite matching, Hungarian algorithm |
-| `02_yolov8_finetune.ipynb` | YOLOv8 on COCO — fine-tuning, mAP evaluation, IoU |
+| `02_yolov8_inference.ipynb` | YOLOv8 on COCO — anchor-free detection, mAP evaluation, IoU |
 | `03_detection_visualization.ipynb` | Bounding box visualization, attention maps, NMS explained |
 | `04_coreml_export.ipynb` | Export YOLOv8 to CoreML, latency benchmark on Apple Neural Engine |
+
+---
+
+## Results
+
+### DETR — Transformer-Based Detection
+
+DETR encodes the image with a ResNet-50 backbone, then uses a transformer encoder-decoder with 100 learned object queries to predict bounding boxes directly — no anchors, no NMS.
+
+<img src="assets/detr_detection.png"/>
+
+**Cross-attention maps** show which image regions each object query attends to when predicting its box. Each query specializes to a different spatial area:
+
+<img src="assets/detr_attention.png"/>
+
+---
+
+### YOLOv8 — Anchor-Free CNN Detection
+
+YOLOv8 divides the image into a grid and predicts boxes at each cell using an anchor-free detection head. NMS filters overlapping predictions.
+
+<img src="assets/yolo_detection.png"/>
+
+**DETR vs YOLOv8 side-by-side** on the same image — same objects detected, different architectures:
+
+<img src="assets/detr_vs_yolo.png"/>
+
+---
+
+### Detection Concepts
+
+**Confidence thresholds** control how many boxes are shown. Lower threshold = more boxes but more noise:
+
+<img src="assets/confidence_thresholds.png"/>
+
+**Non-Maximum Suppression (NMS)** removes duplicate overlapping boxes, keeping only the highest-confidence detection per object:
+
+<img src="assets/nms_comparison.png"/>
+
+**COCO class distribution** across a sample of images — person is by far the most common class:
+
+<img src="assets/class_distribution.png"/>
+
+---
+
+### CoreML Export — Latency Benchmark
+
+YOLOv8n exported to CoreML (6.5 MB). Benchmarked across compute unit configurations on Apple Silicon:
+
+<img src="assets/yolo_coreml_benchmark.png"/>
+
+| Compute Unit | Mean Latency |
+|---|---|
+| ALL (Neural Engine) | **4.2 ± 0.2 ms** |
+| CPU_AND_NE | 4.3 ± 0.4 ms |
+| CPU_ONLY | 17.0 ± 0.2 ms |
+
+`ALL` routes to the Neural Engine automatically — ~4× faster than CPU-only. This is the config used in the iPhone app.
 
 ---
 
