@@ -81,11 +81,13 @@ YOLOv8 divides the image into a grid and predicts boxes at each cell using an an
 
 ### DETR vs YOLOv8
 
-Same image, both models:
+Same image, both models. The panel titles show the key difference:
 
 <img src="assets/detr_vs_yolo.png"/>
 
-> **More detections ≠ better.** DETR finds more boxes on this scene but many are false positives — street lamps detected as *traffic light*, arms detected as *handbag*. YOLOv8 produces fewer, cleaner detections. Combined with 13× fewer parameters and clean CoreML export, YOLOv8 is the right choice for deployment. DETR is studied here for its architecture — the first end-to-end detector with no anchors and no NMS.
+DETR produces 18 boxes — but 9 of them are street lamps misclassified as *traffic light* and arms misclassified as *handbag*. YOLOv8 produces 10 cleaner detections with no such false positives on this scene. Both models have the same underlying limitation — they can only predict the 80 COCO classes — but YOLOv8's detection head produces fewer spurious matches on objects that loosely resemble a known class.
+
+Combined with 13× fewer parameters and a clean CoreML export, YOLOv8 is used for all practical inference. DETR is studied for its architecture — the first end-to-end detector with no anchors and no NMS.
 
 ---
 
@@ -123,11 +125,11 @@ YOLOv8n exported to CoreML (6.5 MB). Benchmarked across compute unit configurati
 
 `ALL` routes to the Neural Engine automatically — ~4× faster than CPU-only. This is the config used in the iPhone app.
 
-**End-to-end demo** — CoreML model parsing `coordinates` and `confidence` outputs, drawing bounding boxes with class labels:
+**End-to-end CoreML inference** — the exported model running through the full on-device pipeline: CoreML loads the `.mlpackage`, runs inference, and returns `coordinates` (N×4 normalized boxes) and `confidence` (N×80 class scores). This confirms the export is correct and the output format parses as expected before building the iPhone app.
 
 <img src="assets/yolo_coreml_demo.png"/>
 
-> **Note on misclassification:** Bollards are detected as *fire hydrant* and street lamps as *traffic light* — COCO has no class for either. The model maps unfamiliar objects to the nearest class it knows. Expected behavior when real-world objects fall outside the 80 training categories.
+> **Note:** The street lamp on the right is detected as *traffic light* — COCO has no street lamp class, so the model maps it to the nearest known category. This is expected when real-world objects fall outside the 80 training classes.
 
 ---
 
