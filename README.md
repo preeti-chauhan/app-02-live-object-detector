@@ -85,9 +85,13 @@ Same image, both models. The panel titles show the key difference:
 
 <img src="assets/detr_vs_yolo.png"/>
 
-DETR produces 18 boxes — but several are arms detected as *handbag* and duplicate boxes on the same object. YOLOv8 produces 10 cleaner detections with fewer spurious matches on this scene. Both models have the same underlying limitation — they can only predict the 80 COCO classes — but YOLOv8's detection head produces fewer spurious matches on objects that loosely resemble a known class.
+The chart below makes the difference clear:
 
-Combined with 13× fewer parameters and a clean CoreML export, YOLOv8 is used for all practical inference. DETR is studied for its architecture — the first end-to-end detector with no anchors and no NMS.
+<img src="assets/detr_vs_yolo_chart.png"/>
+
+Red bars are classes detected by DETR but not YOLOv8 — handbag (arms misread as bags), and stop sign and truck not clearly visible in the scene. DETR also detects 8 traffic lights vs YOLOv8's 3, over-detecting on the street lamps. YOLOv8 produces fewer, more precise detections with 13× fewer parameters.
+
+Combined with a clean CoreML export, YOLOv8 is used for all practical inference. DETR is studied for its architecture — the first end-to-end detector with no anchors and no NMS.
 
 ---
 
