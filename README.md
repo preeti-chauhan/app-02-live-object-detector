@@ -75,7 +75,7 @@ YOLOv8n exported to CoreML (6.5 MB). Benchmarked across compute unit configurati
 
 <img src="assets/yolo_coreml_demo.png"/>
 
-> **Note on misclassification:** The bollards in the foreground are detected as *fire hydrant* — COCO has no bollard class, so the model maps unfamiliar objects to the nearest class it knows. This is expected behavior when the real-world object falls outside the 80 training classes.
+> **Note on misclassification:** Bollards are detected as *fire hydrant* and street lamps as *traffic light* — COCO has no class for either. The model maps unfamiliar objects to the nearest class it knows. Expected behavior when real-world objects fall outside the 80 training categories.
 
 ---
 
