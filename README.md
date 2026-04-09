@@ -37,6 +37,31 @@ Both DETR and YOLOv8 are pretrained on COCO, so no training from scratch is need
 
 ---
 
+## Models
+
+**DETR (Detection Transformer)** — Facebook AI, 2020
+- First end-to-end object detector using a pure transformer
+- No anchors, no NMS (non-maximum suppression) — uses bipartite matching to assign predictions to objects
+- Encodes the image with a CNN backbone, then uses a transformer encoder-decoder to output a fixed set of bounding boxes
+- Slower but architecturally elegant — connects directly to what you learned in app-01
+
+**YOLOv8** — Ultralytics, 2023
+- State-of-the-art real-time detector — "You Only Look Once"
+- CNN-based with anchor-free detection head
+- Extremely fast — designed for on-device inference
+- Industry standard for production CV systems
+
+| | DETR | YOLOv8 |
+|---|---|---|
+| Architecture | Transformer | CNN |
+| Speed | Slower | Fast (real-time) |
+| CoreML export | Complex | Simple |
+| Learning value | High (builds on app-01) | High (industry standard) |
+
+**Approach:** study DETR in notebooks to understand transformer-based detection, use YOLOv8 for the iPhone app.
+
+---
+
 ## Technologies
 
 | Technology | Used For |
