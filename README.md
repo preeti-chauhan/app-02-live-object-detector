@@ -39,6 +39,8 @@ YOLOv8 divides the image into a grid and predicts boxes at each cell using an an
 
 <img src="assets/detr_vs_yolo.png"/>
 
+> **More detections ≠ better.** DETR finds more boxes on this scene but many are false positives — street lamps detected as *traffic light*, arms detected as *handbag*. YOLOv8 produces fewer, cleaner detections. The practical difference: DETR has 41M parameters and can't export to CoreML; YOLOv8n has 3.2M parameters and runs in real time on iPhone. DETR is studied here for its architecture — the first end-to-end detector with no anchors and no NMS — not for deployment.
+
 ---
 
 ### Detection Concepts
