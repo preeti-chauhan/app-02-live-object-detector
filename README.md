@@ -51,7 +51,11 @@ YOLOv8 divides the image into a grid and predicts boxes at each cell using an an
 
 <img src="assets/nms_comparison.png"/>
 
-**COCO class distribution** across a sample of images — person is by far the most common class:
+**Detection across diverse scenes** — same model, different object classes depending on context:
+
+<img src="assets/multi_scene_detection.png"/>
+
+**COCO class distribution** across the sample images:
 
 <img src="assets/class_distribution.png"/>
 
