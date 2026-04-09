@@ -16,6 +16,8 @@ Object detection on iPhone using DETR and YOLOv8 — bounding box prediction wit
 
 Unlike scene classification (one label per image), COCO requires the model to find *where* each object is and *what* it is — simultaneously.
 
+Both DETR and YOLOv8 are pretrained on COCO — no training from scratch needed.
+
 ---
 
 ## Models
@@ -61,8 +63,6 @@ Two models are studied: DETR to understand transformer-based detection, YOLOv8 f
 
 ### DETR — Transformer-Based Detection
 
-DETR encodes the image with a ResNet-50 backbone, then uses a transformer encoder-decoder with 100 learned object queries to predict bounding boxes directly — no anchors, no NMS.
-
 <img src="assets/detr_detection.png"/>
 
 **Cross-attention maps** show which image regions each object query attends to when predicting its box. Each query specializes to a different spatial area:
@@ -72,8 +72,6 @@ DETR encodes the image with a ResNet-50 backbone, then uses a transformer encode
 ---
 
 ### YOLOv8 — Anchor-Free CNN Detection
-
-YOLOv8 divides the image into a grid and predicts boxes at each cell using an anchor-free detection head. NMS filters overlapping predictions.
 
 <img src="assets/yolo_detection.png"/>
 
@@ -89,7 +87,7 @@ The chart below makes the difference clear:
 
 <img src="assets/detr_vs_yolo_chart.png"/>
 
-Red bars are classes detected by DETR but not YOLOv8 — handbag (arms misread as bags), and stop sign and truck not clearly visible in the scene. DETR also detects 8 traffic lights vs YOLOv8's 3, over-detecting on the street lamps. YOLOv8 produces fewer, more precise detections with 13× fewer parameters.
+Red bars are classes DETR detects but YOLOv8 doesn't — handbag (arms misread as bags), truck (the van), stop sign. DETR also fires 8 traffic light boxes vs YOLOv8's 3, over-detecting on every lamp post. YOLOv8 produces fewer, more precise detections with 13× fewer parameters.
 
 Combined with a clean CoreML export, YOLOv8 is used for all practical inference. DETR is studied for its architecture — the first end-to-end detector with no anchors and no NMS.
 
@@ -129,9 +127,7 @@ YOLOv8n exported to CoreML (6.5 MB). Benchmarked across compute unit configurati
 
 `ALL` routes to the Neural Engine automatically — ~4× faster than CPU-only. This is the config used in the iPhone app.
 
-**End-to-end CoreML inference** — the exported model running through the full on-device pipeline: CoreML loads the `.mlpackage`, runs inference, and returns `coordinates` (N×4 normalized boxes) and `confidence` (N×80 class scores). This confirms the export is correct and the output format parses as expected before building the iPhone app.
-
-<img src="assets/yolo_coreml_demo.png"/>
+End-to-end inference confirmed: CoreML loads the `.mlpackage`, runs inference, and returns `coordinates` (N×4 normalized boxes) and `confidence` (N×80 class scores). Output format verified before building the iPhone app.
 
 ---
 
