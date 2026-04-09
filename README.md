@@ -71,9 +71,11 @@ YOLOv8n exported to CoreML (6.5 MB). Benchmarked across compute unit configurati
 
 `ALL` routes to the Neural Engine automatically — ~4× faster than CPU-only. This is the config used in the iPhone app.
 
-**End-to-end demo** — CoreML model running on the bus street scene, parsing `coordinates` and `confidence` outputs, drawing bounding boxes with class labels:
+**End-to-end demo** — CoreML model parsing `coordinates` and `confidence` outputs, drawing bounding boxes with class labels:
 
 <img src="assets/yolo_coreml_demo.png"/>
+
+> **Note on misclassification:** The bollards in the foreground are detected as *fire hydrant* — COCO has no bollard class, so the model maps unfamiliar objects to the nearest class it knows. This is expected behavior when the real-world object falls outside the 80 training classes.
 
 ---
 
