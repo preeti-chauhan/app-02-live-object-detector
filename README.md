@@ -53,7 +53,7 @@ YOLOv8 divides the image into a grid and predicts boxes at each cell using an an
 
 <img src="assets/nms_comparison.png"/>
 
-**Detection across diverse scenes** — same model, different object classes depending on context:
+**Detection across diverse scenes** — YOLOv8n applied to varied real-world photos. DETR is studied for its architecture; YOLOv8 is used for all practical inference:
 
 <img src="assets/multi_scene_detection.png"/>
 
