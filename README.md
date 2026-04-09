@@ -4,6 +4,48 @@ Object detection on iPhone using DETR and YOLOv8 — bounding box prediction wit
 
 ---
 
+## Dataset
+
+**COCO 2017 (Common Objects in Context)**
+
+80 everyday object classes — people, animals, vehicles, food, furniture, electronics, and more.
+
+- 118k training images, 5k validation images
+- Each image contains multiple objects, each annotated with a bounding box and class label
+- Annotation format: `[x, y, width, height]` (top-left corner + size)
+
+Unlike scene classification (one label per image), COCO requires the model to find *where* each object is and *what* it is — simultaneously.
+
+---
+
+## Models
+
+Two models are studied: DETR to understand transformer-based detection, YOLOv8 for deployment.
+
+**DETR (Detection Transformer)** — Facebook AI, 2020
+- First end-to-end object detector using a pure transformer
+- No anchors, no NMS — uses bipartite matching to assign predictions to ground truth
+- Encodes the image with a CNN backbone, then uses a transformer encoder-decoder with 100 learned object queries to predict boxes directly
+- 41M parameters — too large for real-time on-device inference
+
+**YOLOv8** — Ultralytics, 2023
+- State-of-the-art real-time detector — "You Only Look Once"
+- CNN-based with anchor-free detection head and NMS post-processing
+- 3.2M parameters — designed for on-device inference
+- Industry standard for production CV systems
+
+| | DETR | YOLOv8n |
+|---|---|---|
+| Architecture | Transformer | CNN |
+| Parameters | 41M | 3.2M |
+| Speed | Slower | Fast (real-time) |
+| CoreML export | Fails (dynamic control flow) | One line |
+| Use in this project | Notebooks — architecture study | iPhone app — deployment |
+
+**Why DETR can't export to CoreML:** The Hungarian matching algorithm used during training contains dynamic control flow that `torch.jit.trace` cannot handle. YOLOv8 has a fixed computation graph and exports cleanly.
+
+---
+
 ## Notebooks
 
 | Notebook | Description |
@@ -35,11 +77,15 @@ YOLOv8 divides the image into a grid and predicts boxes at each cell using an an
 
 <img src="assets/yolo_detection.png"/>
 
-**DETR vs YOLOv8 side-by-side** on the same image — same objects detected, different architectures:
+---
+
+### DETR vs YOLOv8
+
+Same image, both models:
 
 <img src="assets/detr_vs_yolo.png"/>
 
-> **More detections ≠ better.** DETR finds more boxes on this scene but many are false positives — street lamps detected as *traffic light*, arms detected as *handbag*. YOLOv8 produces fewer, cleaner detections. The practical difference: DETR has 41M parameters and can't export to CoreML; YOLOv8n has 3.2M parameters and runs in real time on iPhone. DETR is studied here for its architecture — the first end-to-end detector with no anchors and no NMS — not for deployment.
+> **More detections ≠ better.** DETR finds more boxes on this scene but many are false positives — street lamps detected as *traffic light*, arms detected as *handbag*. YOLOv8 produces fewer, cleaner detections. Combined with 13× fewer parameters and clean CoreML export, YOLOv8 is the right choice for deployment. DETR is studied here for its architecture — the first end-to-end detector with no anchors and no NMS.
 
 ---
 
@@ -53,11 +99,11 @@ YOLOv8 divides the image into a grid and predicts boxes at each cell using an an
 
 <img src="assets/nms_comparison.png"/>
 
-**Detection across diverse scenes** — YOLOv8n applied to varied real-world photos. DETR is studied for its architecture; YOLOv8 is used for all practical inference:
+**Detection across diverse scenes** — YOLOv8n applied to varied real-world photos, showing the model generalizes across object types and contexts:
 
 <img src="assets/multi_scene_detection.png"/>
 
-**COCO class distribution** across the sample images:
+**COCO class distribution** across the sample images — person and car dominate outdoor scenes, while indoor scenes surface food and tableware classes:
 
 <img src="assets/class_distribution.png"/>
 
@@ -91,53 +137,12 @@ Object detection running on-device via CoreML. Select a photo — the model draw
 
 ---
 
-## Dataset
-
-**COCO 2017 (Common Objects in Context)**
-
-80 everyday object classes — people, animals, vehicles, food, furniture, electronics, and more.
-
-- 118k training images, 5k validation images
-- Each image contains multiple objects, each annotated with a bounding box and class label
-- Annotation format: `[x, y, width, height]` (top-left corner + size)
-
-Unlike scene classification (one label per image), COCO requires the model to find *where* each object is and *what* it is — simultaneously.
-
-Both DETR and YOLOv8 are pretrained on COCO, so no training from scratch is needed.
-
----
-
-## Models
-
-**DETR (Detection Transformer)** — Facebook AI, 2020
-- First end-to-end object detector using a pure transformer
-- No anchors, no NMS (non-maximum suppression) — uses bipartite matching to assign predictions to objects
-- Encodes the image with a CNN backbone, then uses a transformer encoder-decoder to output a fixed set of bounding boxes
-- Slower but architecturally elegant — connects directly to what you learned in app-01
-
-**YOLOv8** — Ultralytics, 2023
-- State-of-the-art real-time detector — "You Only Look Once"
-- CNN-based with anchor-free detection head
-- Extremely fast — designed for on-device inference
-- Industry standard for production CV systems
-
-| | DETR | YOLOv8 |
-|---|---|---|
-| Architecture | Transformer | CNN |
-| Speed | Slower | Fast (real-time) |
-| CoreML export | Complex | Simple |
-| Learning value | High (builds on app-01) | High (industry standard) |
-
-**Approach:** study DETR in notebooks to understand transformer-based detection, use YOLOv8 for the iPhone app.
-
----
-
 ## Technologies
 
 | Technology | Used For |
 |---|---|
 | PyTorch + transformers | DETR architecture and inference |
-| Ultralytics YOLOv8 | Training and fine-tuning |
-| coremltools | CoreML export |
+| Ultralytics YOLOv8 | Detection, inference, CoreML export |
+| coremltools | CoreML export and benchmarking |
 | SwiftUI + PhotosUI | iOS app UI |
-| CoreML + Vision | On-device inference |
+| CoreML | On-device inference |
