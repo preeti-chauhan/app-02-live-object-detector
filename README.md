@@ -44,7 +44,7 @@ Two models are studied: DETR to understand transformer-based detection, YOLOv8 f
 | CoreML export | Fails (dynamic control flow) | One line |
 | Use in this project | Notebooks — architecture study | iPhone app — deployment |
 
-**Why DETR can't export to CoreML:** The Hungarian matching algorithm used during training contains dynamic control flow that `torch.jit.trace` cannot handle. YOLOv8 has a fixed computation graph and exports cleanly.
+**Why DETR can't export to CoreML:** At inference time, DETR's post-processing involves dynamic control flow — variable-length outputs and conditional masking based on confidence threshold cause `torch.jit.trace` to break, since trace records one fixed execution path and fails when output shapes change across inputs. YOLOv8 bakes NMS directly into the CoreML model as a static `NMSLayer`, giving it a fixed computation graph regardless of input.
 
 ---
 
