@@ -24,13 +24,13 @@ Both DETR and YOLOv8 are pretrained on COCO — no training from scratch needed.
 
 Two models are studied: DETR to understand transformer-based detection, YOLOv8 for deployment.
 
-**DETR (Detection Transformer)** — Facebook AI, 2020
+**DETR (Detection Transformer)** — [Carion et al., 2020](https://arxiv.org/abs/2005.12872)
 - First end-to-end object detector using a pure transformer
 - No anchors, no NMS — uses bipartite matching to assign predictions to ground truth
 - Encodes the image with a CNN backbone, then uses a transformer encoder-decoder with 100 learned object queries to predict boxes directly
 - 41M parameters — too large for real-time on-device inference
 
-**YOLOv8** — Ultralytics, 2023
+**YOLOv8** — [Ultralytics, 2023](https://github.com/ultralytics/ultralytics)
 - State-of-the-art real-time detector — "You Only Look Once"
 - CNN-based with anchor-free detection head and NMS post-processing
 - 3.2M parameters — designed for on-device inference
