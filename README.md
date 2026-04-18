@@ -127,11 +127,12 @@ YOLOv8n exported to CoreML (6.5 MB). Benchmarked across compute unit configurati
 
 | Compute Unit | Mean Latency |
 |---|---|
-| ALL (Neural Engine) | **4.2 ± 0.2 ms** |
-| CPU_AND_NE | 4.3 ± 0.4 ms |
-| CPU_ONLY | 17.0 ± 0.2 ms |
+| ALL (Neural Engine) | **4.7 ± 0.1 ms** |
+| CPU_AND_NE | 4.6 ± 0.1 ms |
+| CPU_ONLY | 18.1 ± 0.4 ms |
+| PyTorch MPS | 61.6 ± 6.5 ms |
 
-`ALL` routes to the Neural Engine automatically — ~4× faster than CPU-only. This is the config used in the iPhone app.
+`ALL` routes to the Neural Engine automatically — ~4× faster than CPU-only. CoreML here outperforms PyTorch MPS by 13×, in contrast to app-01 where MPS was faster: YOLOv8n at 6.5 MB is small enough for the Neural Engine to route efficiently. This is the config used in the iPhone app.
 
 End-to-end inference confirmed: CoreML loads the `.mlpackage`, runs inference, and returns `coordinates` (N×4 normalized boxes) and `confidence` (N×80 class scores). Output format verified before building the iPhone app.
 
