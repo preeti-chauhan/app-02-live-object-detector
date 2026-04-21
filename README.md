@@ -142,6 +142,30 @@ End-to-end inference confirmed: CoreML loads the `.mlpackage`, runs inference, a
 
 Object detection running on-device via CoreML. Select a photo — the model draws bounding boxes with class labels and confidence scores.
 
+**Preprocessing pipeline** (equivalent to YOLOv8's resize used at export time):
+
+```swift
+// Resize UIImage to 640×640 → CVPixelBuffer (BGRA)
+// CoreML receives the pixel buffer and routes it to the Neural Engine
+let output = try model.prediction(image: buffer, iouThreshold: 0.45, confidenceThreshold: 0.4)
+```
+
+**Parsing output:**
+
+```swift
+// coordinates: MLMultiArray (N, 4) — normalized (cx, cy, w, h) in [0, 1]
+// confidence:  MLMultiArray (N, 80) — class scores per box
+let cx = output.coordinates[[i, 0] as [NSNumber]].floatValue
+let cy = output.coordinates[[i, 1] as [NSNumber]].floatValue
+// Convert to top-left origin: x = cx - w/2, y = cy - h/2
+```
+
+Bounding boxes are drawn directly on the image using SwiftUI `Canvas`. Each class maps to a consistent color; confidence and class label are shown in a label above each box. The detection list shows top results with confidence bars.
+
+<p align="center">
+  <img src="LiveObjectDetector/demo.gif" width="280"/>
+</p>
+
 ---
 
 ## Technologies
