@@ -2,6 +2,8 @@
 
 Object detection on iPhone using DETR and YOLOv8 — bounding box prediction with class labels and confidence scores, exported to CoreML for on-device inference.
 
+[Read the blog post →](https://www.preeti-chauhan.com/Live-Object-Detector/)
+
 ---
 
 ## Dataset
