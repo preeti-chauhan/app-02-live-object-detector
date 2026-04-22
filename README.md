@@ -58,6 +58,7 @@ Two models are studied: DETR to understand transformer-based detection, YOLOv8 f
 | `02_yolov8_inference.ipynb` | YOLOv8 on COCO — anchor-free detection, mAP evaluation, IoU |
 | `03_detection_visualization.ipynb` | Bounding box visualization, attention maps, NMS explained |
 | `04_coreml_export.ipynb` | Export YOLOv8 to CoreML, latency benchmark on Apple Neural Engine |
+| `05_int8_export.ipynb` | INT8 quantization: size vs accuracy vs latency comparison (FP32 vs INT8) |
 
 ---
 
@@ -168,6 +169,50 @@ Bounding boxes are drawn directly on the image using SwiftUI `Canvas`. Each clas
   <img src="LiveObjectDetector/demo.gif" width="280"/>
 </p>
 
+
+## Live Camera App
+
+Real-time object detection on iPhone using `AVCaptureSession` — bounding boxes update live as you move the camera, with a FPS counter and inference time overlay.
+
+**Pipeline:**
+1. `AVCaptureSession` streams 720p frames from the back camera
+2. Each frame arrives as a `CVPixelBuffer` — fed directly to the CoreML model (no resizing needed; CoreML handles it)
+3. YOLOv8n runs on the Neural Engine via `computeUnits = .all`
+4. Detections are overlaid using SwiftUI `Canvas` — updated on every inference result
+
+```swift
+func captureOutput(_ output: AVCaptureOutput,
+                   didOutput sampleBuffer: CMSampleBuffer,
+                   from connection: AVCaptureConnection) {
+    guard let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else { return }
+    let result = try model.prediction(image: pixelBuffer,
+                                      iouThreshold: 0.45,
+                                      confidenceThreshold: 0.4)
+}
+```
+
+Inference runs every 2nd frame to prevent queue backlog. FPS and inference time are published via `@Published` and shown in a HUD overlay.
+
+---
+
+## INT8 Quantization
+
+YOLOv8n re-exported with INT8 quantization using `coremltools` — same model, 4× smaller, faster on-device.
+
+```python
+model.export(format='coreml', nms=True, int8=True)
+```
+
+| | FP32 | INT8 |
+|---|---|---|
+| File size | 6.5 MB | 1.7 MB |
+| Mean latency (Neural Engine) | 4.7 ms | 4.2 ms |
+| mAP50 (COCO val) | 0.524 | 0.521 |
+
+Weight compression from 32-bit floats to 8-bit integers: 4× size reduction with negligible accuracy loss. The Neural Engine handles INT8 natively — a direct speed improvement on A-series chips.
+
+See `notebooks/05_int8_export.ipynb` for the full export, latency benchmark (50 runs, 10 warmup), and side-by-side detection comparison.
+
 ---
 
 ## Technologies
@@ -178,4 +223,5 @@ Bounding boxes are drawn directly on the image using SwiftUI `Canvas`. Each clas
 | Ultralytics YOLOv8 | Detection, inference, CoreML export |
 | coremltools | CoreML export and benchmarking |
 | SwiftUI + PhotosUI | iOS app UI |
+| AVFoundation | Live camera feed (AVCaptureSession) |
 | CoreML | On-device inference |
