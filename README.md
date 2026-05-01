@@ -211,6 +211,10 @@ func captureOutput(_ output: AVCaptureOutput,
 
 Inference runs every 2nd frame to prevent queue backlog. FPS and inference time are published via `@Published` and shown in a HUD overlay.
 
+<p align="center">
+  <img src="LiveObjectDetectorCamera/demo.gif" width="280"/>
+</p>
+
 ---
 
 ## INT8 Quantization
