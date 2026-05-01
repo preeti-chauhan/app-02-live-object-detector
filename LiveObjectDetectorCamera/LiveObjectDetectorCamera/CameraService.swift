@@ -51,7 +51,11 @@ final class CameraService: NSObject, ObservableObject, AVCaptureVideoDataOutputS
 
     override init() {
         let config = MLModelConfiguration()
+        #if targetEnvironment(simulator)
+        config.computeUnits = .cpuOnly
+        #else
         config.computeUnits = .all
+        #endif
         guard let m = try? yolov8n(configuration: config) else {
             fatalError("Failed to load yolov8n.mlpackage")
         }
@@ -83,7 +87,8 @@ final class CameraService: NSObject, ObservableObject, AVCaptureVideoDataOutputS
         session.beginConfiguration()
         session.sessionPreset = .hd1280x720
 
-        guard let device = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back),
+        guard let device = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back)
+                           ?? AVCaptureDevice.default(for: .video),
               let input = try? AVCaptureDeviceInput(device: device),
               session.canAddInput(input) else {
             session.commitConfiguration()
@@ -133,10 +138,11 @@ final class CameraService: NSObject, ObservableObject, AVCaptureVideoDataOutputS
         frameIndex += 1
         guard frameIndex % 2 == 0 else { return }
 
-        guard let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else { return }
+        guard let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer),
+              let resized = resize(pixelBuffer, to: CGSize(width: 640, height: 640)) else { return }
 
         let t0 = CACurrentMediaTime()
-        guard let output = try? model.prediction(image: pixelBuffer,
+        guard let output = try? model.prediction(image: resized,
                                                   iouThreshold: 0.45,
                                                   confidenceThreshold: 0.4) else { return }
         let ms = (CACurrentMediaTime() - t0) * 1000
@@ -181,5 +187,19 @@ final class CameraService: NSObject, ObservableObject, AVCaptureVideoDataOutputS
             results.append(Detection(classIndex: classIdx, confidence: maxConf, rect: rect))
         }
         return results.sorted { $0.confidence > $1.confidence }
+    }
+
+    // MARK: - Resize
+    private func resize(_ buffer: CVPixelBuffer, to size: CGSize) -> CVPixelBuffer? {
+        var out: CVPixelBuffer?
+        CVPixelBufferCreate(nil, Int(size.width), Int(size.height),
+                            kCVPixelFormatType_32BGRA, nil, &out)
+        guard let out else { return nil }
+        let ciImage = CIImage(cvPixelBuffer: buffer)
+        let scaleX = size.width  / CGFloat(CVPixelBufferGetWidth(buffer))
+        let scaleY = size.height / CGFloat(CVPixelBufferGetHeight(buffer))
+        let scaled = ciImage.transformed(by: CGAffineTransform(scaleX: scaleX, y: scaleY))
+        CIContext().render(scaled, to: out)
+        return out
     }
 }

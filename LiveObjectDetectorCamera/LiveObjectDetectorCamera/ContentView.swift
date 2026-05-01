@@ -1,8 +1,10 @@
 import SwiftUI
 import AVFoundation
+import ReplayKit
 
 struct ContentView: View {
     @StateObject private var camera = CameraService()
+    @State private var isRecording = false
 
     var body: some View {
         ZStack {
@@ -57,6 +59,19 @@ struct ContentView: View {
                 Spacer()
             }
 
+            if !isRecording {
+                VStack {
+                    Spacer()
+                    Button(action: toggleRecording) {
+                        Image(systemName: "record.circle")
+                            .font(.system(size: 56))
+                            .foregroundStyle(.white)
+                            .shadow(radius: 4)
+                    }
+                    .padding(.bottom, 40)
+                }
+            }
+
             if camera.permissionDenied {
                 VStack(spacing: 12) {
                     Image(systemName: "camera.slash.fill")
@@ -74,8 +89,30 @@ struct ContentView: View {
                 .cornerRadius(16)
             }
         }
+        .onTapGesture { if isRecording { toggleRecording() } }
         .onAppear { camera.start() }
         .onDisappear { camera.stop() }
+    }
+
+    private func toggleRecording() {
+        let recorder = RPScreenRecorder.shared()
+        if isRecording {
+            recorder.stopRecording { preview, _ in
+                isRecording = false
+                guard let preview else { return }
+                preview.previewControllerDelegate = RecordingDelegate.shared
+                DispatchQueue.main.async {
+                    UIApplication.shared.connectedScenes
+                        .compactMap { $0 as? UIWindowScene }
+                        .first?.windows.first?.rootViewController?
+                        .present(preview, animated: true)
+                }
+            }
+        } else {
+            recorder.startRecording { _ in
+                DispatchQueue.main.async { isRecording = true }
+            }
+        }
     }
 
     private func boxColor(for classIndex: Int) -> Color {
@@ -98,4 +135,11 @@ struct CameraPreview: UIViewRepresentable {
 final class PreviewView: UIView {
     override class var layerClass: AnyClass { AVCaptureVideoPreviewLayer.self }
     var videoPreviewLayer: AVCaptureVideoPreviewLayer { layer as! AVCaptureVideoPreviewLayer }
+}
+
+final class RecordingDelegate: NSObject, RPPreviewViewControllerDelegate {
+    static let shared = RecordingDelegate()
+    func previewControllerDidFinish(_ previewController: RPPreviewViewController) {
+        previewController.dismiss(animated: true)
+    }
 }
