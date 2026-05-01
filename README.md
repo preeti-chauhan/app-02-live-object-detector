@@ -170,13 +170,15 @@ Bounding boxes are drawn directly on the image using SwiftUI `Canvas`. Each clas
 </p>
 
 
+---
+
 ## Live Camera App
 
 Real-time object detection on iPhone using `AVCaptureSession` — bounding boxes update live as you move the camera, with a FPS counter and inference time overlay.
 
 **Pipeline:**
 1. `AVCaptureSession` streams 720p frames from the back camera
-2. Each frame arrives as a `CVPixelBuffer` — fed directly to the CoreML model (no resizing needed; CoreML handles it)
+2. Each frame arrives as a `CVPixelBuffer` — resized to 640×640 before inference (the model's expected input size)
 3. YOLOv8n runs on the Neural Engine via `computeUnits = .all`
 4. Detections are overlaid using SwiftUI `Canvas` — updated on every inference result
 
@@ -184,8 +186,9 @@ Real-time object detection on iPhone using `AVCaptureSession` — bounding boxes
 func captureOutput(_ output: AVCaptureOutput,
                    didOutput sampleBuffer: CMSampleBuffer,
                    from connection: AVCaptureConnection) {
-    guard let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else { return }
-    let result = try model.prediction(image: pixelBuffer,
+    guard let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer),
+          let resized = resize(pixelBuffer, to: CGSize(width: 640, height: 640)) else { return }
+    let result = try model.prediction(image: resized,
                                       iouThreshold: 0.45,
                                       confidenceThreshold: 0.4)
 }
