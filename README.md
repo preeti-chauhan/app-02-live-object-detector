@@ -1,8 +1,20 @@
 # Live Object Detector
 
-Object detection on iPhone using DETR and YOLOv8 — bounding box prediction with class labels and confidence scores, exported to CoreML for on-device inference.
+<p align="center">
+  <img src="LiveObjectDetectorCamera/demo.gif" width="280"/>
+</p>
+
+Real-time object detection on iPhone — YOLOv8n running on the Neural Engine at 30 FPS, bounding boxes overlaid live via `AVCaptureSession`. Point the camera at anything from the COCO 80 classes and detections appear instantly.
 
 [Read the blog post →](https://www.preeti-chauhan.com/Live-Object-Detector/)
+
+---
+
+## What This Is
+
+Two models are studied side by side: **DETR** to understand how transformers approach detection end-to-end, and **YOLOv8** for on-device deployment. The project covers the full pipeline — dataset, detection concepts, architecture comparison, CoreML export, latency benchmarking, and two iPhone apps (photo picker and live camera).
+
+**Why two models?** DETR is architecturally the most elegant modern detector — no anchors, no NMS, pure set prediction. But it can't export to CoreML. YOLOv8 can, in one line, at 3.2M parameters. Studying both makes the deployment tradeoff concrete.
 
 ---
 
