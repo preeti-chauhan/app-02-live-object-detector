@@ -59,9 +59,10 @@ Two models are studied: DETR to understand transformer-based detection, YOLOv8 f
 |---|---|---|
 | Architecture | Transformer | CNN |
 | Parameters | 41M | 3.2M |
+| NMS needed | No (bipartite matching) | Yes |
 | Speed | Slower | Fast (real-time) |
 | CoreML export | Fails (dynamic control flow) | One line |
-| Use in this project | Notebooks — architecture study | iPhone app — deployment |
+| mAP@0.5:0.95 | ~42 | ~37 |
 
 **Why DETR can't export to CoreML:** At inference time, DETR's post-processing involves dynamic control flow — variable-length outputs and conditional masking based on confidence threshold cause `torch.jit.trace` to break, since trace records one fixed execution path and fails when output shapes change across inputs. YOLOv8 bakes NMS directly into the CoreML model as a static `NMSLayer`, giving it a fixed computation graph regardless of input.
 
@@ -232,6 +233,16 @@ model.export(format='coreml', nms=True, int8=True)
 Weight compression from 32-bit floats to 8-bit integers: 4× size reduction with negligible accuracy loss. The Neural Engine handles INT8 natively — a direct speed improvement on A-series chips.
 
 See `notebooks/05_int8_export.ipynb` for the full export, latency benchmark (50 runs, 10 warmup), and side-by-side detection comparison.
+
+---
+
+## Insights
+
+**DETR is architecturally elegant but impractical for on-device deployment.** Eliminating NMS via bipartite matching is a genuine innovation — but the resulting dynamic post-processing graph prevents CoreML export. For production CV, a static graph matters as much as accuracy.
+
+**Smaller models benefit more from the Neural Engine.** YOLOv8n at 6.5 MB achieves 13× speedup over PyTorch MPS via CoreML. ViT-B/16 at 171 MB showed almost no speedup — the Neural Engine's efficiency advantage depends on model size fitting within its memory budget.
+
+**More detections ≠ better.** DETR fires 18 boxes on the street scene vs YOLOv8's 10 — the extras include lamp posts as traffic lights. Fewer, more precise detections with a clean export make YOLOv8 the right choice for deployment.
 
 ---
 
