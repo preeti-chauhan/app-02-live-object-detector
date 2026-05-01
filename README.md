@@ -1,7 +1,12 @@
 # Live Object Detector
 
 <p align="center">
-  <img src="LiveObjectDetectorCamera/demo.gif" width="280"/>
+  <img src="LiveObjectDetector/demo.gif" width="260"/>
+  &nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="LiveObjectDetectorCamera/demo.gif" width="260"/>
+</p>
+<p align="center">
+  <sub>Photo picker app &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Live camera app</sub>
 </p>
 
 Real-time object detection on iPhone — YOLOv8n running on the Neural Engine at 30 FPS, bounding boxes overlaid live via `AVCaptureSession`. Point the camera at anything from the COCO 80 classes and detections appear instantly.
