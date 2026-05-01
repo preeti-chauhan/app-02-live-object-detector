@@ -187,6 +187,8 @@ Bounding boxes are drawn directly on the image using SwiftUI `Canvas`. Each clas
 
 ## Live Camera App
 
+The photo picker app above validated the CoreML pipeline end-to-end on a static input — correct output format, coordinates, and confidence scores. With that confirmed, the input source was swapped to a live camera stream.
+
 Real-time object detection on iPhone using `AVCaptureSession` — bounding boxes update live as you move the camera, with a FPS counter and inference time overlay.
 
 **Pipeline:**
